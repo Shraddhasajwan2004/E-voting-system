@@ -1,5 +1,4 @@
 import { pool } from '../config/db.js';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-for-voting-app';
@@ -8,10 +7,9 @@ export const register = async (req: any, res: any) => {
   const { name, email, mobile, aadhaar_last4, password, face_data, address, city, state } = req.body;
   
   try {
-    const password_hash = await bcrypt.hash(password, 10);
     const [result]: any = await pool.query(
       'INSERT INTO users (name, email, mobile, aadhaar_last4, password_hash, address, city, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [name, email, mobile, aadhaar_last4, password_hash, address || '', city || '', state || '']
+      [name, email, mobile, aadhaar_last4, password, address || '', city || '', state || '']
     );
     const newUserId = result.insertId;
     
@@ -69,7 +67,7 @@ export const login = async (req: any, res: any) => {
     const user = users[0];
     if (!user) return res.status(400).json({ error: 'User not found' });
 
-    const validPassword = await bcrypt.compare(password, user.password_hash);
+    const validPassword = password === user.password_hash;
     if (!validPassword) return res.status(400).json({ error: 'Invalid password' });
 
     const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '2h' });
@@ -173,7 +171,7 @@ export const verifyVoter = async (req: any, res: any) => {
     }
 
     // Verify Password
-    const validPassword = await bcrypt.compare(password, user.password_hash);
+    const validPassword = password === user.password_hash;
     if (!validPassword) {
       return res.status(400).json({ error: 'Invalid password' });
     }
@@ -203,8 +201,7 @@ export const resetPassword = async (req: any, res: any) => {
       return res.status(400).json({ error: 'Verification failed. Details do not match our records.' });
     }
 
-    const password_hash = await bcrypt.hash(newPassword, 10);
-    await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash, user.id]);
+    await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [newPassword, user.id]);
 
     res.json({ message: 'Password reset successful' });
   } catch (error) {

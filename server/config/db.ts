@@ -1,5 +1,4 @@
 import mysql from 'mysql2/promise';
-import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -200,10 +199,9 @@ export const initializeDB = async () => {
 
     const [adminRows]: any = await pool.query('SELECT COUNT(*) as count FROM users WHERE role = ?', ['admin']);
     if (adminRows[0].count === 0) {
-      const password_hash = await bcrypt.hash('admin123', 10);
       await pool.query(
         'INSERT INTO users (name, email, mobile, aadhaar_last4, password_hash, role, address, city, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        ['Admin User', 'admin@eci.gov.in', '9999999999', '1234', password_hash, 'admin', 'Election Commission HQ', 'New Delhi', 'Delhi']
+        ['Admin User', 'admin@eci.gov.in', '9999999999', '1234', 'admin123', 'admin', 'Election Commission HQ', 'New Delhi', 'Delhi']
       );
     }
 
