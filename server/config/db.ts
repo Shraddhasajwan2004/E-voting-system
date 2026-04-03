@@ -147,6 +147,7 @@ export const initializeDB = async () => {
 
     // Seed Data
     const [constRows]: any = await pool.query('SELECT COUNT(*) as count FROM constituencies');
+    console.log(`Constituencies count: ${constRows[0].count}`);
     if (constRows[0].count === 0) {
       const initialConstituencies = [
         ['Visakhapatnam', 'Visakhapatnam', 'Andhra Pradesh'],

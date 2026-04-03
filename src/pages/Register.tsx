@@ -25,15 +25,23 @@ export default function Register() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [states, setStates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
   
   const webcamRef = useRef<Webcam>(null);
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
+    setLoadingStates(true);
+    console.log('Fetching states from /api/auth/states...');
     fetch('/api/auth/states')
-      .then(res => res.json())
+      .then(res => {
+        console.log('States response status:', res.status);
+        return res.json();
+      })
       .then(data => {
+        console.log('States data received:', data);
         if (Array.isArray(data)) {
           setStates(data);
         } else {
@@ -41,11 +49,13 @@ export default function Register() {
           setStates([]);
         }
       })
-      .catch(err => console.error('Error fetching states:', err));
+      .catch(err => console.error('Error fetching states:', err))
+      .finally(() => setLoadingStates(false));
   }, []);
 
   useEffect(() => {
     if (formData.state) {
+      setLoadingCities(true);
       fetch(`/api/auth/cities?state=${formData.state}`)
         .then(res => res.json())
         .then(data => {
@@ -56,7 +66,8 @@ export default function Register() {
             setCities([]);
           }
         })
-        .catch(err => console.error('Error fetching cities:', err));
+        .catch(err => console.error('Error fetching cities:', err))
+        .finally(() => setLoadingCities(false));
     } else {
       setCities([]);
     }
@@ -266,13 +277,17 @@ export default function Register() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-gray-900 dark:text-white shadow-sm appearance-none"
               >
-                <option value="">Select State</option>
+                <option value="">{loadingStates ? 'Loading states...' : 'Select State'}</option>
                 {states.map(state => (
                   <option key={state} value={state}>{state}</option>
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <MapPin className="h-5 w-5 text-gray-400" />
+                {loadingStates ? (
+                  <RefreshCw className="h-5 w-5 text-gray-400 animate-spin" />
+                ) : (
+                  <MapPin className="h-5 w-5 text-gray-400" />
+                )}
               </div>
             </div>
           </div>
@@ -283,18 +298,22 @@ export default function Register() {
               <select
                 name="city"
                 required
-                disabled={!formData.state}
+                disabled={!formData.state || loadingCities}
                 value={formData.city}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-gray-900 dark:text-white shadow-sm appearance-none disabled:opacity-50"
               >
-                <option value="">Select City</option>
+                <option value="">{loadingCities ? 'Loading cities...' : 'Select City'}</option>
                 {cities.map(city => (
                   <option key={city} value={city}>{city}</option>
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <MapPin className="h-5 w-5 text-gray-400" />
+                {loadingCities ? (
+                  <RefreshCw className="h-5 w-5 text-gray-400 animate-spin" />
+                ) : (
+                  <MapPin className="h-5 w-5 text-gray-400" />
+                )}
               </div>
             </div>
           </div>

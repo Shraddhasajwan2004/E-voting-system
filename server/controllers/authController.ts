@@ -216,8 +216,10 @@ export const resetPassword = async (req: any, res: any) => {
 export const getStates = async (req: any, res: any) => {
   try {
     const [states]: any = await pool.query('SELECT DISTINCT state FROM constituencies ORDER BY state ASC');
+    console.log('Fetched states:', states);
     res.json(states.map((s: any) => s.state));
   } catch (error) {
+    console.error('Error in getStates:', error);
     res.status(500).json({ error: 'Failed to fetch states' });
   }
 };

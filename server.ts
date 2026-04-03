@@ -15,15 +15,15 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 
 app.use(express.json());
 
-// Initialize DB
-initializeDB();
-
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', voterRoutes);
 app.use('/api/admin', adminRoutes);
 
 async function startServer() {
+  // Initialize DB
+  await initializeDB();
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
