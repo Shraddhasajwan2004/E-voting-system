@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'motion/react';
 import { UserPlus, FileText, Camera, CheckCircle, AlertCircle, RefreshCw, MapPin } from 'lucide-react';
 import Webcam from 'react-webcam';
+import { API_BASE_URL } from '../api';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -34,10 +35,14 @@ export default function Register() {
 
   useEffect(() => {
     setLoadingStates(true);
-    console.log('Fetching states from /api/auth/states...');
-    fetch('/api/auth/states')
+    console.log(`Fetching states from: ${API_BASE_URL}/api/auth/states`);
+    if (!API_BASE_URL && window.location.hostname !== 'localhost') {
+      console.warn('VITE_API_URL is not set! API calls will likely fail on Vercel.');
+    }
+    fetch(`${API_BASE_URL}/api/auth/states`)
       .then(res => {
         console.log('States response status:', res.status);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
       })
       .then(data => {
@@ -49,14 +54,17 @@ export default function Register() {
           setStates([]);
         }
       })
-      .catch(err => console.error('Error fetching states:', err))
+      .catch(err => {
+        console.error('Error fetching states:', err);
+        setError(`Failed to load states: ${err.message}`);
+      })
       .finally(() => setLoadingStates(false));
   }, []);
 
   useEffect(() => {
     if (formData.state) {
       setLoadingCities(true);
-      fetch(`/api/auth/cities?state=${formData.state}`)
+      fetch(`${API_BASE_URL}/api/auth/cities?state=${formData.state}`)
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) {
@@ -109,7 +117,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, face_data: capturedImage }),

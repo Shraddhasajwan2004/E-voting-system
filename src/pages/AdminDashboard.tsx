@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
 import { Users, Vote, Percent, FileText, Download, ShieldCheck, AlertTriangle, MapPin, Edit, CheckCircle, XCircle, Edit2, Settings } from 'lucide-react';
+import { API_BASE_URL } from '../api';
 
 interface Stats {
   totalVoters: number;
@@ -103,12 +104,12 @@ export default function AdminDashboard() {
     try {
       const headers = { Authorization: `Bearer ${token}` };
       const [statsRes, resultsRes, votersRes, complaintsRes, candidatesRes, timelineRes] = await Promise.all([
-        fetch('/api/admin/stats', { headers }),
-        fetch('/api/admin/results', { headers }),
-        fetch('/api/admin/voters', { headers }),
-        fetch('/api/admin/complaints', { headers }),
-        fetch('/api/admin/candidates', { headers }),
-        fetch('/api/settings/timeline', { headers })
+        fetch(`${API_BASE_URL}/api/admin/stats`, { headers }),
+        fetch(`${API_BASE_URL}/api/admin/results`, { headers }),
+        fetch(`${API_BASE_URL}/api/admin/voters`, { headers }),
+        fetch(`${API_BASE_URL}/api/admin/complaints`, { headers }),
+        fetch(`${API_BASE_URL}/api/admin/candidates`, { headers }),
+        fetch(`${API_BASE_URL}/api/settings/timeline`, { headers })
       ]);
 
       if (!statsRes.ok) throw new Error('Failed to fetch stats');
@@ -132,7 +133,7 @@ export default function AdminDashboard() {
   const handleUpdateTimeline = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/admin/settings/timeline', {
+      const res = await fetch(`${API_BASE_URL}/api/admin/settings/timeline`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -157,7 +158,7 @@ export default function AdminDashboard() {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/users/profile', {
+      const res = await fetch(`${API_BASE_URL}/api/users/profile`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -189,7 +190,7 @@ export default function AdminDashboard() {
     }
     fetchData();
 
-    fetch('/api/auth/states')
+    fetch(`${API_BASE_URL}/api/auth/states`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -204,7 +205,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (newCandidate.state) {
-      fetch(`/api/auth/cities?state=${newCandidate.state}`)
+      fetch(`${API_BASE_URL}/api/auth/cities?state=${newCandidate.state}`)
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) {
@@ -222,7 +223,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (newCandidate.city) {
-      fetch(`/api/auth/constituencies?city=${newCandidate.city}&state=${newCandidate.state}`)
+      fetch(`${API_BASE_URL}/api/auth/constituencies?city=${newCandidate.city}&state=${newCandidate.state}`)
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) {
@@ -246,7 +247,7 @@ export default function AdminDashboard() {
     if (!editingVoter) return;
     
     try {
-      const res = await fetch(`/api/admin/voters/${editingVoter.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/voters/${editingVoter.id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -266,7 +267,7 @@ export default function AdminDashboard() {
 
   const handleUpdateComplaint = async (id: number, status: string) => {
     try {
-      const res = await fetch(`/api/admin/complaints/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/complaints/${id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -285,7 +286,7 @@ export default function AdminDashboard() {
   const handleAddCandidate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/admin/candidates', {
+      const res = await fetch(`${API_BASE_URL}/api/admin/candidates`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -312,7 +313,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Are you sure you want to delete this candidate?')) return;
     
     try {
-      const res = await fetch(`/api/admin/candidates/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/candidates/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

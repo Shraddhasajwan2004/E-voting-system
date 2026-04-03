@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldCheck, Camera, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { API_BASE_URL } from '../api';
 
 interface Candidate {
   id: number;
@@ -43,7 +44,7 @@ export default function VotingBooth() {
 
     const checkTimelineAndFetchCandidates = async () => {
       try {
-        const timelineRes = await fetch('/api/settings/timeline');
+        const timelineRes = await fetch(`${API_BASE_URL}/api/settings/timeline`);
         if (timelineRes.ok) {
           const timeline = await timelineRes.json();
           const now = new Date();
@@ -59,7 +60,7 @@ export default function VotingBooth() {
           }
         }
 
-        const response = await fetch('/api/candidates', {
+        const response = await fetch(`${API_BASE_URL}/api/candidates`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -80,7 +81,7 @@ export default function VotingBooth() {
     setIsVerifying(true);
     setError('');
     try {
-      const response = await fetch('/api/auth/verify-voter', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/verify-voter`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +111,7 @@ export default function VotingBooth() {
     setError('');
 
     try {
-      const response = await fetch('/api/vote', {
+      const response = await fetch(`${API_BASE_URL}/api/vote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

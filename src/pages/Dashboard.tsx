@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, MapPin, CheckCircle, AlertTriangle, FileText, Download, MessageSquare, Edit2 } from 'lucide-react';
+import { API_BASE_URL } from '../api';
 
 export default function Dashboard() {
   const { user, token, login } = useAuth();
@@ -36,7 +37,7 @@ export default function Dashboard() {
       // Fetch face image
       const fetchFaceImage = async () => {
         try {
-          const res = await fetch('/api/users/face', {
+          const res = await fetch(`${API_BASE_URL}/api/users/face`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           if (res.ok) {
@@ -57,7 +58,7 @@ export default function Dashboard() {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/users/profile', {
+      const res = await fetch(`${API_BASE_URL}/api/users/profile`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -84,7 +85,7 @@ export default function Dashboard() {
   const handleSubmitComplaint = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/complaints', {
+      const res = await fetch(`${API_BASE_URL}/api/complaints`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

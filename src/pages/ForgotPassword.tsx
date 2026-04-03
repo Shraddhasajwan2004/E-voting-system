@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ShieldCheck, Mail, User, Phone, MapPin, Lock, RefreshCw, ArrowLeft, Globe } from 'lucide-react';
+import { API_BASE_URL } from '../api';
 
 export default function ForgotPassword() {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ export default function ForgotPassword() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('/api/auth/states')
+    fetch(`${API_BASE_URL}/api/auth/states`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -38,7 +39,7 @@ export default function ForgotPassword() {
 
   useEffect(() => {
     if (formData.state) {
-      fetch(`/api/auth/cities?state=${formData.state}`)
+      fetch(`${API_BASE_URL}/api/auth/cities?state=${formData.state}`)
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) {
@@ -76,7 +77,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

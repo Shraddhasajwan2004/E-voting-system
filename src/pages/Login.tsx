@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldCheck, Lock, Mail, Camera, User } from 'lucide-react';
 import Webcam from 'react-webcam';
+import { API_BASE_URL } from '../api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -28,7 +29,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -68,7 +69,7 @@ export default function Login() {
       setError('');
       
       try {
-        const faceResponse = await fetch('/api/auth/face-login', {
+        const faceResponse = await fetch(`${API_BASE_URL}/api/auth/face-login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, face_data: imageSrc }),
